@@ -41,7 +41,8 @@ end
     flag=flag(a:b,1);
     n=size(w,1);
 
-    [vel ss q]=motion(w,aa,yw,flag);
+    %[vel ss q]=motion(w,aa,yw,flag);
+    [F vel ss q]=motion(w,aa,yw,flag);
     t=0:T:(n-2)*T;
     figure()
     subplot(2,1,1)
