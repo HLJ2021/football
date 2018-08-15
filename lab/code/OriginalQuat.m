@@ -1,4 +1,4 @@
-function qs_E=OriginalQuat(ax,ay,az,xw_w)
+function qs_E=OriginalQuat(ax,ay,az,xs_s)
 
      norm1=sqrt(ax(1,1)*ax(1,1)+ay(1,1)*ay(1,1)+az(1,1)*az(1,1));
      ax(1,1)=ax(1,1)/norm1;
@@ -11,9 +11,10 @@ function qs_E=OriginalQuat(ax,ay,az,xw_w)
      mz=0;
      yaw=atan(-my*cos(roll)/mx*cos(pitch)+my*sin(pitch)*sin(roll));
      qs_w=angle2quat(yaw,pitch,roll);
-     qw_s=quatconj(qs_w);
-     xs_w=quatmultiply(quatmultiply(qs_w,xw_w),qw_s);
-     angle=atan(xs_w(2)/xs_w(3));
-     qw_E=[cos(angle/2) 0 0 -sin(angle/2)];
-     qs_E=quatmultiply(qw_E,qs_w);
+      qw_s=quatconj(qs_w);
+      xs_w=quatmultiply(quatmultiply(qs_w,xs_s),qw_s);
+      angle=atan(xs_w(3)/xs_w(2));
+      qw_E=[cos(angle/2) 0 0 -sin(angle/2)];
+      qs_E=quatmultiply(qw_E,qs_w);
+
 end

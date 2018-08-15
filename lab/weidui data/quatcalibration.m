@@ -21,6 +21,7 @@ for i=1:n
     a(i,1:4)=[0 data(i,1) data(i,2) data(i,3)];
    aaa(i,1:4)=quatmultiply(quatmultiply(q(i,:),a(i,1:4)),qq);
    aaa(i,1:4)=aaa(i,1:4)-[0,0,0,1];
+    aaa(i,1:4)=aaa(i,1:4)*9.8;
    if i==1
         a1=a1+T*aaa(i,2);
         b1=b1+T*aaa(i,3);

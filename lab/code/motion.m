@@ -6,8 +6,8 @@ wz=w(:,3);
 ax=aa(:,1);
 ay=aa(:,2);
 az=aa(:,3);
-error=mean(yw(1:50,1));
-%B1=pi*(error/180)*sqrt(3/4);
+%error=mean(yw(1:20,1));
+error=0.0175; % legacy 0.0175, microteam 0.0169
 B1=error*sqrt(3/4);
 %B1=1;
 f1=[];
@@ -24,7 +24,7 @@ qq0=zeros(n,1);
 qq1=zeros(n,1);
 qq2=zeros(n,1);
 qq3=zeros(n,1);
-%��Ԫ����ʼֵ�ļ���
+%detect the inital quaternion
 qs_E=OriginalQuat(ax(1,1),ay(1,1),az(1,1),[0 1 0 0]);
 q0(1,1)=qs_E(1,1);
 q1(1,1)=qs_E(1,2);
@@ -45,8 +45,8 @@ q(1,:)=qs_E;
 % q(1,:)=[0.9405,0.2655,-0.1268,-0.1701];
 
 %left foot coordinate
-vectorx=[-1 0 0]/100;
-vectory=[0 -1 0]/100;
+vectorx=[1 0 0]/100;
+vectory=[0 1 0]/100;
 vectorz=[0 0 1]/100;
 %left foot
 %xd1=[-1 1;-1 1]/100;
@@ -63,11 +63,11 @@ vectorz=[0 0 1]/100;
     figure(4)
     %axis([-2 2 -2 2 -2 2])
     %plot3([1/100,0,0],[0,0,0],'r-')
-    plot3([0,-1/100],[0,0],[0,0])
+    plot3([0,1/100],[0,0],[0,0])
     text(1/100,0,0,'X','FontSize',10)
     hold on
     %plot3([0,1/100,0],[0,0,0],'r-')
-    plot3([0,0],[0,-1/100],[0,0])
+    plot3([0,0],[0,1/100],[0,0])
     text(0,1/100,0,'Y','FontSize',10)
     hold on
     %plot3([0,0,1/100],[0,0,0],'r-')
@@ -115,10 +115,10 @@ for i=1:n-1
     %x=abs(sqrt(ax(i,1)^2+ay(i,1)^2+az(i,1)^2)-1);
     %B1=1-(1/sqrt(2*0.5*pi)*exp(-(x-0.2)^2/2*0.5));
 
-%     norm2=sqrt(ax(i,1)*ax(i,1)+ay(i,1)*ay(i,1)+az(i,1)*az(i,1));
-%     ax(i,1)=ax(i,1)/norm2;
-%     ay(i,1)=ay(i,1)/norm2;
-%     az(i,1)=az(i,1)/norm2;
+    norm2=sqrt(ax(i,1)*ax(i,1)+ay(i,1)*ay(i,1)+az(i,1)*az(i,1));
+    ax(i,1)=ax(i,1)/norm2;
+    ay(i,1)=ay(i,1)/norm2;
+    az(i,1)=az(i,1)/norm2;
 
     f1(i,1)=2*q1(i,1)*q3(i,1)-2*q0(i,1)*q2(i,1)-ax(i,1);
     f2(i,1)=2*q0(i,1)*q1(i,1)-2*q2(i,1)*q3(i,1)-ay(i,1);
@@ -162,14 +162,13 @@ for i=1:n-1
    % M=[1-2*(q2(i+1,1)^2+q3(i+1,1)^2) 2*(q1(i+1,1)*q2(i+1,1)-q0(i+1,1)*q3(i+1,1)) 2*(q0(i+1,1)*q2(i+1,1)+q1(i+1,1)*q3(i+1,1));
    %     2*(q1(i+1,1)*q2(i+1,1)+q0(i+1,1)*q3(i+1,1)) 1-2*(q1(i+1,1)^2+q3(i+1,1)^2) 2*(q2(i+1,1)*q3(i+1,1)-q0(i+1,1)*q1(i+1,1));
    %     2*(q1(i+1,1)*q3(i+1,1)-q0(i+1,1)*q2(i+1,1)) 2*(q2(i+1,1)*q3(i+1,1)+q0(i+1,1)*q1(i+1,1)) 1-2*(q1(i+1,1)^2+q2(i+1,1)^2)];
-   %�ҽ�
    %g=q*[0;0;0;norm1]*qq;
-   %����
    %g=q*[0;0;-norm1];
    a(i,1:4)=[0 aa(i,1) aa(i,2) aa(i,3)];
    %start(1,1:4)=quatmultiply(quatmultiply(q(2,:),a(1,1:4)),qq);
    aaa(i,1:4)=quatmultiply(quatmultiply(q(i+1,:),a(i,1:4)),qq);
    aaa(i,1:4)=aaa(i,1:4)-[0,0,0,1];
+   aaa(i,1:4)=aaa(i,1:4)*9.8;
    %aaa(i,1:4)=aaa(i,1:4)-start(1,1:4);
 
   % aa(i,1)=aa(i,1)-g(1,1);
