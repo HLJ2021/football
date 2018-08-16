@@ -1,5 +1,5 @@
-function [F vel ss q]=motion(w,aa,yw,flag)
-%function [vel ss q]=motion(w,aa,yw,flag)
+%function [F vel ss q]=motion(w,aa,yw,flag)
+function [vel ss q]=motion(w,aa,yw,flag)
 wx=w(:,1);
 wy=w(:,2);
 wz=w(:,3);
@@ -99,7 +99,7 @@ for i=1:n-1
 %     if i==1
 %         qs_E=OriginalQuat(ax(i,1),ay(i,1),az(i,1),[0 xw_w(:,2) xw_w(:,3) 0]);
 %     else
-%         qs_E=OriginalQuat(aaa(i-1,2),aaa(i-1,3),aaa(i-1,4),[0 xw_w(:,2) xw_w(:,3) 0]);
+%         qs_E=OriginalQuat(ax(i-1,1),ax(i-1,1),ax(i-1,1),[0 xw_w(:,2) xw_w(:,3) 0]);
 %     end
 %     q0(i,1)=qs_E(1,1);
 %     q1(i,1)=qs_E(1,2);
@@ -119,6 +119,16 @@ for i=1:n-1
     ax(i,1)=ax(i,1)/norm2;
     ay(i,1)=ay(i,1)/norm2;
     az(i,1)=az(i,1)/norm2;
+    
+%     xw_w=quatmultiply(quatmultiply(q(i,:),[0 1 0 0]),quatconj(q(i,:)));
+%     if i>1
+%         qs_E=OriginalQuat(ax(i-1,1),ax(i-1,1),ax(i-1,1),[0 xw_w(:,2) xw_w(:,3) 0]);
+%     end
+%     q0(i,1)=qs_E(1,1);
+%     q1(i,1)=qs_E(1,2);
+%     q2(i,1)=qs_E(1,3);
+%     q3(i,1)=qs_E(1,4);
+%     q(i,:)=qs_E;
 
     f1(i,1)=2*q1(i,1)*q3(i,1)-2*q0(i,1)*q2(i,1)-ax(i,1);
     f2(i,1)=2*q0(i,1)*q1(i,1)-2*q2(i,1)*q3(i,1)-ay(i,1);
@@ -222,67 +232,67 @@ for i=1:n-1
         %ss(i,:)=ss(i,:)*q;
    end
 
-   % temp = [xd1(1,1) yd1(1,1) zd1(1,1);
-   %         xd1(1,2) yd1(1,2) zd1(1,2);
-   %         xd1(2,2) yd1(2,2) zd1(2,2)]
-   tempA=[0 vectorx];
-   tempB=[0 vectory];
-   tempC=[0 vectorz];
-   %tempA=[0 A];
-   %tempB=[0 B];
-   %tempC=[0 C];
-   tA=quatmultiply(quatmultiply(q(i+1,:),tempA),qq);
-   tB=quatmultiply(quatmultiply(q(i+1,:),tempB),qq);
-   tC=quatmultiply(quatmultiply(q(i+1,:),tempC),qq);
-    %temp = M*temp;
-    %xd = [temp(1,1),temp(2,1);temp(1,1),temp(3,1)];
-    %yd = [temp(1,2),temp(2,2);temp(1,2),temp(3,2)];
-    %zd = [temp(1,3),temp(2,3);temp(1,3),temp(3,3)];
-    %xd = [tA(1,2),tB(1,2),tC(1,2)];
-    %yd = [tA(1,3),tB(1,3),tC(1,3)];
-    %zd = [tA(1,4),tB(1,4),tC(1,4)];
-    xd = [tA(1,2),tB(1,2),tC(1,2)]+ss(i,1);
-    yd = [tA(1,3),tB(1,3),tC(1,3)]+ss(i,2);
-    zd = [tA(1,4),tB(1,4),tC(1,4)]+ss(i,3);
-
-
-
-    figure(4)
-    grid on
-    plot3([ss(i,1),xd(1,1)],[ss(i,2),yd(1,1)],[ss(i,3),zd(1,1)])
-    text(xd(1,1),yd(1,1),zd(1,1),'X','FontSize',10)
-    hold on
-    %plot3([tB(1,2),tB(1,3),tB(1,4)],[ss(i,1),ss(i,2),ss(i,3)],'r-')
-    %plot3([ss(i,1),tB(1,2)],[ss(i,2),tB(1,3)],[ss(i,3),tB(1,4)])
-    plot3([ss(i,1),xd(1,2)],[ss(i,2),yd(1,2)],[ss(i,3),zd(1,2)])
-    text(xd(1,2),yd(1,2),zd(1,2),'Y','FontSize',10)
-    hold on
-    %plot3([tC(1,2),tC(1,3),tC(1,4)],[ss(i,1),ss(i,2),ss(i,3)],'r-')
-    %plot3([ss(i,1),tC(1,2)],[ss(i,2),tC(1,3)],[ss(i,3),tC(1,4)])
-    plot3([ss(i,1),xd(1,3)],[ss(i,2),yd(1,3)],[ss(i,3),zd(1,3)])
-    text(xd(1,3),yd(1,3),zd(1,3),'Z','FontSize',10)
-    hold on
-    %surf(xd,yd,zd)
-    %view(90,90)
-    %axis([-2 2 -2 2 -2 2])
-    xlabel('x')
-    ylabel('y')
-    zlabel('z')
-    %text(xd(1,1),yd(1,1),zd(1,1),'A','FontSize',6)
-    %text(xd(1,2),yd(1,2),zd(1,2),'B','FontSize',6)
-    %text(xd(2,2),yd(2,2),zd(2,2),'C','FontSize',6)
-    titlename=strcat(int2str(i) ,'of', int2str(n));
-    title(titlename)
-    hold on
-    F(i)=getframe(gcf);
-    %aviobj=addframe(aviobj,F);
-    %im=frame2im(F);
-    %[I,map]=rgb2ind(im,256);
-    %imwrite(im,'qua.gif','gif','DelayTime',0.1,'writemode','append')
-
-    %xd=xd-ss(i,1);
-    %yd=yd-ss(i,2);
-    %zd=zd-ss(i,3);
+%    % temp = [xd1(1,1) yd1(1,1) zd1(1,1);
+%    %         xd1(1,2) yd1(1,2) zd1(1,2);
+%    %         xd1(2,2) yd1(2,2) zd1(2,2)]
+%    tempA=[0 vectorx];
+%    tempB=[0 vectory];
+%    tempC=[0 vectorz];
+%    %tempA=[0 A];
+%    %tempB=[0 B];
+%    %tempC=[0 C];
+%    tA=quatmultiply(quatmultiply(q(i+1,:),tempA),qq);
+%    tB=quatmultiply(quatmultiply(q(i+1,:),tempB),qq);
+%    tC=quatmultiply(quatmultiply(q(i+1,:),tempC),qq);
+%     %temp = M*temp;
+%     %xd = [temp(1,1),temp(2,1);temp(1,1),temp(3,1)];
+%     %yd = [temp(1,2),temp(2,2);temp(1,2),temp(3,2)];
+%     %zd = [temp(1,3),temp(2,3);temp(1,3),temp(3,3)];
+%     %xd = [tA(1,2),tB(1,2),tC(1,2)];
+%     %yd = [tA(1,3),tB(1,3),tC(1,3)];
+%     %zd = [tA(1,4),tB(1,4),tC(1,4)];
+%     xd = [tA(1,2),tB(1,2),tC(1,2)]+ss(i,1);
+%     yd = [tA(1,3),tB(1,3),tC(1,3)]+ss(i,2);
+%     zd = [tA(1,4),tB(1,4),tC(1,4)]+ss(i,3);
+% 
+% 
+% 
+%     figure(4)
+%     grid on
+%     plot3([ss(i,1),xd(1,1)],[ss(i,2),yd(1,1)],[ss(i,3),zd(1,1)])
+%     text(xd(1,1),yd(1,1),zd(1,1),'X','FontSize',10)
+%     hold on
+%     %plot3([tB(1,2),tB(1,3),tB(1,4)],[ss(i,1),ss(i,2),ss(i,3)],'r-')
+%     %plot3([ss(i,1),tB(1,2)],[ss(i,2),tB(1,3)],[ss(i,3),tB(1,4)])
+%     plot3([ss(i,1),xd(1,2)],[ss(i,2),yd(1,2)],[ss(i,3),zd(1,2)])
+%     text(xd(1,2),yd(1,2),zd(1,2),'Y','FontSize',10)
+%     hold on
+%     %plot3([tC(1,2),tC(1,3),tC(1,4)],[ss(i,1),ss(i,2),ss(i,3)],'r-')
+%     %plot3([ss(i,1),tC(1,2)],[ss(i,2),tC(1,3)],[ss(i,3),tC(1,4)])
+%     plot3([ss(i,1),xd(1,3)],[ss(i,2),yd(1,3)],[ss(i,3),zd(1,3)])
+%     text(xd(1,3),yd(1,3),zd(1,3),'Z','FontSize',10)
+%     hold on
+%     %surf(xd,yd,zd)
+%     %view(90,90)
+%     %axis([-2 2 -2 2 -2 2])
+%     xlabel('x')
+%     ylabel('y')
+%     zlabel('z')
+%     %text(xd(1,1),yd(1,1),zd(1,1),'A','FontSize',6)
+%     %text(xd(1,2),yd(1,2),zd(1,2),'B','FontSize',6)
+%     %text(xd(2,2),yd(2,2),zd(2,2),'C','FontSize',6)
+%     titlename=strcat(int2str(i) ,'of', int2str(n));
+%     title(titlename)
+%     hold on
+%     F(i)=getframe(gcf);
+%     %aviobj=addframe(aviobj,F);
+%     %im=frame2im(F);
+%     %[I,map]=rgb2ind(im,256);
+%     %imwrite(im,'qua.gif','gif','DelayTime',0.1,'writemode','append')
+% 
+%     %xd=xd-ss(i,1);
+%     %yd=yd-ss(i,2);
+%     %zd=zd-ss(i,3);
 
 end
 
