@@ -13,8 +13,8 @@ th2=th2+w(i,1);
 c=c+1;
 end
 end
-Threshold1=th1/b;
-Threshold2=th2/c;
+Threshold1=th1/b+0.2;
+Threshold2=th2/c+0.2;
 %Threshold1=th1/b-0.2;
 %Threshold2=th2/c-1.2;
 end
