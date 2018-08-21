@@ -119,16 +119,26 @@ for i=1:n-1
     ax(i,1)=ax(i,1)/norm2;
     ay(i,1)=ay(i,1)/norm2;
     az(i,1)=az(i,1)/norm2;
-    
+
 %     xw_w=quatmultiply(quatmultiply(q(i,:),[0 1 0 0]),quatconj(q(i,:)));
 %     if i>1
 %         qs_E=OriginalQuat(ax(i-1,1),ax(i-1,1),ax(i-1,1),[0 xw_w(:,2) xw_w(:,3) 0]);
 %     end
-%     q0(i,1)=qs_E(1,1);
-%     q1(i,1)=qs_E(1,2);
-%     q2(i,1)=qs_E(1,3);
-%     q3(i,1)=qs_E(1,4);
-%     q(i,:)=qs_E;
+%     q0_c(i,1)=qs_E(1,1);
+%     q1_c(i,1)=qs_E(1,2);
+%     q2_c(i,1)=qs_E(1,3);
+%     q3_c(i,1)=qs_E(1,4);
+%     q_c(i,:)=qs_E;
+%
+%     f1(i,1)=2*q1_c(i,1)*q3_c(i,1)-2*q0_c(i,1)*q2_c(i,1)-ax(i,1);
+%     f2(i,1)=2*q0_c(i,1)*q1_c(i,1)-2*q2_c(i,1)*q3_c(i,1)-ay(i,1);
+%     f3(i,1)=1-2*q1_c(i,1)*q1_c(i,1)-2*q2_c(i,1)*q2_c(i,1)-az(i,1);
+%     j1124(i,1)=2*q2_c(i,1);
+%     j1223(i,1)=2*q3_c(i,1);
+%     j1322(i,1)=2*q0_c(i,1);
+%     j1421(i,1)=2*q1_c(i,1);
+%     j32(i,1)=2*j1421(i,1);
+%     j33(i,1)=2*j1124(i,1);
 
     f1(i,1)=2*q1(i,1)*q3(i,1)-2*q0(i,1)*q2(i,1)-ax(i,1);
     f2(i,1)=2*q0(i,1)*q1(i,1)-2*q2(i,1)*q3(i,1)-ay(i,1);
@@ -254,9 +264,9 @@ for i=1:n-1
 %     xd = [tA(1,2),tB(1,2),tC(1,2)]+ss(i,1);
 %     yd = [tA(1,3),tB(1,3),tC(1,3)]+ss(i,2);
 %     zd = [tA(1,4),tB(1,4),tC(1,4)]+ss(i,3);
-% 
-% 
-% 
+%
+%
+%
 %     figure(4)
 %     grid on
 %     plot3([ss(i,1),xd(1,1)],[ss(i,2),yd(1,1)],[ss(i,3),zd(1,1)])
@@ -289,7 +299,7 @@ for i=1:n-1
 %     %im=frame2im(F);
 %     %[I,map]=rgb2ind(im,256);
 %     %imwrite(im,'qua.gif','gif','DelayTime',0.1,'writemode','append')
-% 
+%
 %     %xd=xd-ss(i,1);
 %     %yd=yd-ss(i,2);
 %     %zd=zd-ss(i,3);

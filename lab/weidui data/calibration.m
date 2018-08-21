@@ -29,9 +29,12 @@ end
     saveas(gcf,filename);
     cla(ax1)
     cla(ax2)
+    
+    [th1,th2]=Threshold(y,yw);
 for ij=1:n
-        if y(ij,1)>0.8&&yw(ij,1)>0.5  % 1.5&&1   1&&0.5
+        %if y(ij,1)>1&&yw(ij,1)>0.8  % 1.5&&0.8   0.8&&0.5
         %if yw(ij,1)>1
+        if y(ij,1)>th1&&yw(ij,1)>th2
             flag(ij,1)=0;
         else
             flag(ij,1)=1;
@@ -70,17 +73,17 @@ end
     ax2=subplot(2,1,2);
     plot(t,ss(:,1)',t,ss(:,2)',t,ss(:,3)','LineWidth',2)
     legend('x','y','z')
-    filename11=strcat('velandss',int2str(j),'.fig');
-    saveas(gcf,filename11);
-    cla(ax1)
-    cla(ax2)
+%     filename11=strcat('velandss',int2str(j),'.fig');
+%     saveas(gcf,filename11);
+%     cla(ax1)
+%     cla(ax2)
 
     figure(5)
      stem3(ss(:,1),ss(:,2),ss(:,3),'LineWidth',2)
      xlabel('x')
      ylabel('y')
      zlabel('z')
-     filename7=strcat('trajectory', int2str(j) , '.fig');
-     saveas(gcf,filename7);
-     cla;
+%      filename7=strcat('trajectory', int2str(j) , '.fig');
+%      saveas(gcf,filename7);
+%      cla;
 end
