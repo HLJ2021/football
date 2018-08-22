@@ -31,3 +31,16 @@ class Quat():
         self.q1 = q1
         self.q2 = q2
         self.q3 = q3
+
+class Motion():
+    """ motion return data
+    """
+    def __init__(self,quat,vel,ss):
+        self.quat=quat
+        self.vel=vel
+        self.ss=ss
+
+class total():
+    def __init__(self,acc_total,gyro_total):
+        self.acc_total=acc_total
+        self.gyro_total=gyro_total

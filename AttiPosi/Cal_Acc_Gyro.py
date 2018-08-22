@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 
 import data_type
 
+f=100
+T=1/f
+
 
 def CalculateTotal(acc_data,gyro_data):
-    n=len(acc_data.x_data)
-    f=100
-    T=1/f
-    t=np.linspace(0,(n-1)*T,n)
+
     acc_total=[]
     gyro_total=[]
     for x,y,z in zip(acc_data.x_data,acc_data.y_data,acc_data.z_data):
@@ -20,19 +20,25 @@ def CalculateTotal(acc_data,gyro_data):
         gyro_norm=math.sqrt(a**2+b**2+c**2)
         gyro_total.append(gyro_norm)
 
-    fig=plt.figure
-    ax1=fig.subplot(2,1,1)
-    ax1.plot(t,acc_data.x_data,t,acc_data.y_data,t,acc_data.z_datat,acc_total)
-    ax1.legend('x','y','z','total')
-    ax2=fig.subplot(2,1,2)
-    ax2.plot(t,gyro_data.x_data,t,gyro_data.y_data,t,gyro_data.z_datat,gyro_total)
-    ax2.legend('x','y','z','total')
+    return data_type.total(acc_total,gyro_total)
+
+
+def contac_detection(acc_data,gyro_data,n):
 
     count1=0
     count2=0
     th1=0
     th2=0
-    for i in range(10,n-11):
+    contact_flag=[]
+
+    total=CalculateTotal(acc_data,gyro_data)
+    acc_total=total.acc_total
+    gyro_total=total.gyro_total
+
+    print(acc_total)
+    print(gyro_total)
+
+    for i in range(10,n-10):
         if (acc_total[i]<=acc_total[i-10] and acc_total[i]<=acc_total[i-1] and
             acc_total[i]<=acc_total[i+1] and acc_total[i]<=acc_total[i+10]):
             th1=th1+acc_total[i]
@@ -41,12 +47,33 @@ def CalculateTotal(acc_data,gyro_data):
             gyro_total[i]<=gyro_total[i+1] and gyro_total[i]<=gyro_total[i+10]):
             th2=th2+gyro_total[i]
             count2=count2+1
-    threshold1=th1/count1+0.2
-    threshold2=th2/count2+0.2
+    threshold1=th1/count1-0.1   # according to the experince
+    threshold2=th2/count2-0.35
 
-    for j in range(0,n-1):
+    print(threshold1)
+    print(threshold2)
+
+    for j in range(0,n):
         if (acc_total[j]>threshold1 and gyro_total[j]>threshold2):
-            contact_flag[j]=False
+            flag=0
         else:
-            contact_flag[j]=True
+            flag=1
+        contact_flag.append(flag)
+
     return contact_flag
+
+"""
+def drawAccGyro(acc_data,gyro_data,acc_total,gyro_total):
+
+    t=np.linspace(0,(n-1)*T,n)
+
+    fig=plt.figure
+    ax1=fig.subplot(2,1,1)
+    ax1.plot(t,acc_data.x_data,t,acc_data.y_data,t,acc_data.z_data,t,acc_total)
+    ax1.legend('x','y','z','total')
+    ax2=fig.subplot(2,1,2)
+    ax2.plot(t,gyro_data.x_data,t,gyro_data.y_data,t,gyro_data.z_data,t,gyro_total)
+    ax2.legend('x','y','z','total')
+
+    return fig
+"""

@@ -4,6 +4,7 @@ Created on Mon Aug 20 10:04:44 2018
 
 @author: HLJ
 """
+"""
 import math
 
 
@@ -32,3 +33,26 @@ xs_w=quatmultiply(quatmultiply(q,[0,1,0,0]),qw_s)
 angle=math.atan(xs_w[2]/xs_w[1])
 qw_E=[math.cos(angle/2),0,0,-math.sin(angle/2)]
 qs_E=quatmultiply(qw_E,q)
+"""
+vel=[]
+
+class Vec3():
+    """ 3 dimensional vector.
+    """
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+a1=1
+b1=2
+c1=3
+vell=Vec3(a1,b1,c1)
+vel.append(vell)
+
+a1=6
+b1=7
+c1=8
+vell=Vec3(a1,b1,c1)
+vel.append(vell)
+ 

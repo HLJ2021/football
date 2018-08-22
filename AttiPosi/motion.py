@@ -36,7 +36,7 @@ def OriginalQuat(ax,ay,az,xs_s):
     qs_w=angle2quat(yaw,pitch,roll)
     qw_s=quatconj(qs_w)
     xs_w=quatmultiply(quatmultiply(qs_w,xs_s),qw_s)
-    angle=math.atan(xs_w[2]]/xs_w[1]])
+    angle=math.atan(xs_w[2]/xs_w[1])
     qw_E=[math.cos(angle/2),0,0,-math.sin(angle/2)]
     qs_E=quatmultiply(qw_E,qs_w)
     return qs_E
@@ -45,7 +45,7 @@ def OriginalQuat(ax,ay,az,xs_s):
 
 def motion(acc_data,gyro_data,contact_flag):
 
-    erro=0.0175               # legacy 0.0175    micro team 0.0169
+    error=0.0175               # legacy 0.0175    micro team 0.0169
     B=error*math.sqrt(3/4)
     f1=[]
     f2=[]
@@ -65,18 +65,30 @@ def motion(acc_data,gyro_data,contact_flag):
     hat3=[]
     hat4=[]
     aa=[]
-    vel=[]
-    ss=[]
+    velx=[]
+    vely=[]
+    velz=[]
+    ssx=[]
+    ssy=[]
+    ssz=[]
+    q0=[]
+    q1=[]
+    q2=[]
+    q3=[]
     n=len(acc_data.x_data)
     f=100
     T=1/f
 
     # detect the inital quaternion
     qs_E=OriginalQuat(acc_data.x_data[0],acc_data.y_data[0],acc_data.z_data[0],[0,1,0,0])
-    q0[0]=qs_E[0]
-    q1[0]=qs_E[1]
-    q2[0]=qs_E[2];
-    q3[0]=qs_E[3];
+    q00=qs_E[0]
+    q11=qs_E[1]
+    q22=qs_E[2];
+    q33=qs_E[3];
+    q0.append(q00)
+    q1.append(q11)
+    q2.append(q22)
+    q3.append(q33)
     ax=acc_data.x_data
     ay=acc_data.y_data
     az=acc_data.z_data
@@ -89,7 +101,7 @@ def motion(acc_data,gyro_data,contact_flag):
 
         # use acc data to calculate attitude
         norm2=math.sqrt(ax[i]*ax[i]+ay[i]*ay[i]+az[i]*az[i]);
-        ax[i]=ax[i]norm2;
+        ax[i]=ax[i]/norm2;
         ay[i]=ay[i]/norm2;
         az[i]=az[i]/norm2;
 
@@ -100,8 +112,8 @@ def motion(acc_data,gyro_data,contact_flag):
         jj1223=2*q3[i];
         jj1322=2*q0[i];
         jj1421=2*q1[i];
-        jj32=2*j1421[i];
-        jj33=2*j1124[i];
+        jj32=2*jj1421;
+        jj33=2*jj1124;
 
         f1.append(ff1)
         f2.append(ff2)
@@ -141,14 +153,14 @@ def motion(acc_data,gyro_data,contact_flag):
         qq2.append(qqq2)
         qq3.append(qqq3)
 
-        q00 = q0[i]+(qq0[i]-B1*hat1[i])*0.01;
-        q11 = q1[i]+(qq1[i]-B1*hat2[i])*0.01;
-        q22 = q2[i]+(qq2[i]-B1*hat3[i])*0.01;
-        q33 = q3[i]+(qq3[i]-B1*hat4[i])*0.01;
+        q00 = q0[i]+(qq0[i]-B*hat1[i])*0.01;
+        q11 = q1[i]+(qq1[i]-B*hat2[i])*0.01;
+        q22 = q2[i]+(qq2[i]-B*hat3[i])*0.01;
+        q33 = q3[i]+(qq3[i]-B*hat4[i])*0.01;
 
         q0.append(q00)
         q1.append(q11)
-        q2.appemd(q22)
+        q2.append(q22)
         q3.append(q33)
 
         norm = math.sqrt(q0[i+1]*q0[i+1] + q1[i+1]*q1[i+1] + q2[i+1]*q2[i+1] + q3[i+1]*q3[i+1]);
@@ -162,42 +174,68 @@ def motion(acc_data,gyro_data,contact_flag):
         a=[0,ax[i],ay[i],az[i]]
         qq=quatconj(q)
         aaa=quatmultiply(quatmultiply(q,a),qq)
-        aaa=(aaa-[0,0,0,1])*9.8
+        aaa[0]=aaa[0]*9.8
+        aaa[1]=aaa[1]*9.8
+        aaa[2]=aaa[2]*9.8
+        aaa[3]=(aaa[3]-1)*9.8
 
         aa.append(aaa)
 
         # calculate the velocity and position
         if i==0:
+            a1=0
+            b1=0
+            c1=0
             a1=a1+T*aa[i][1]
             b1=b1+T*aa[i][2]
             c1=c1+T*aa[i][3]
-            vell=[a1,b1,c1]
-            vel.append(vell)
-            a2=a2+vel[i][0]*T+T*T*aa[i][1]/2;
-            b2=b2+vel[i][1]*T+T*T*aa[i][2]/2;
-            c2=c2+vel[i][2]*T+T*T*aa[i][3]/2;
-            sss=[a2,b2,c2]
-            ss.append(sss)
+            velx.append(a1)
+            vely.append(b1)
+            velz.append(c1)
+            a2=0
+            b2=0
+            c2=0
+            a2=a2+velx[i]*T+T*T*aa[i][1]/2;
+            b2=b2+vely[i]*T+T*T*aa[i][2]/2;
+            c2=c2+velz[i]*T+T*T*aa[i][3]/2;
+            ssx.append(a2)
+            ssy.append(b2)
+            ssz.append(c2)
         else:
-            if contact_flag[i]==True:
-                a1=0;
-                b1=0;
-                c1=0;
-                vell=[a1,b1,c1]
-                vel.append(vell)
-                a2=ss[i-1][0]
-                b2=ss[i-1][1]
-                c2=ss[i-1][2]
-                sss=[a2,b2,c2]
-                ss.append(sss)
+            if contact_flag[i]==1:
+                a1=0
+                b1=0
+                c1=0
+                velx.append(a1)
+                vely.append(b1)
+                velz.append(c1)
+                a2=ssx[i-1]
+                b2=ssy[i-1]
+                c2=ssz[i-1]
+                ssx.append(a2)
+                ssy.append(b2)
+                ssz.append(c2)
             else:
-                a1=a1+T*(aa[i][1]+aa[i-1][1])/2;
-                b1=b1+T*(aa[i][2]+aa[i-1][2])/2;
-                c1=c1+T*(aa[i][3]+aa[i-1][3])/2;
-                vell=[a1,b1,c1]
-                vel.append(vell)
-                a2=a2+vel[i][0]*T+T*T*(aa[i][1]+aa[i-1][1])/4;
-                b2=b2+vel[i][1]*T+T*T*(aa[i][2]+aa[i-1][2])/4;
-                c2=c2+vel[i][2]*T+T*T*(aa[i][3]+aa[i-1][3])/4;
-                sss=[a2,b2,c2]
-                ss.append(sss)
+                a1=a1+T*(aa[i][1]+aa[i-1][1])/2
+                b1=b1+T*(aa[i][2]+aa[i-1][2])/2
+                c1=c1+T*(aa[i][3]+aa[i-1][3])/2
+                velx.append(a1)
+                vely.append(b1)
+                velz.append(c1)
+                a2=a2+velx[i]*T+T*T*(aa[i][1]+aa[i-1][1])/4
+                b2=b2+vely[i]*T+T*T*(aa[i][2]+aa[i-1][2])/4
+                c2=c2+velz[i]*T+T*T*(aa[i][3]+aa[i-1][3])/4
+                ssx.append(a2)
+                ssy.append(b2)
+                ssz.append(c2)
+    velx.append(0)
+    vely.append(0)
+    velz.append(0)
+    ssx.append(0)
+    ssy.append(0)
+    ssz.append(0)
+    quater=data_type.Quat(q0,q1,q2,q3)
+    vel=data_type.Vec3Data(velx,vely,velz)
+    ss=data_type.Vec3Data(ssx,ssy,ssz)
+
+    return data_type.Motion(quater,vel,ss)
