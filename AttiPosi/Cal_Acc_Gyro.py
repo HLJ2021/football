@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 
 import data_type
 
-f=100
-T=1/f
 
 def CalculateTotal(acc_data,gyro_data):
     n=len(acc_data.x_data)
+    f=100
+    T=1/f
     t=np.linspace(0,(n-1)*T,n)
     acc_total=[]
     gyro_total=[]

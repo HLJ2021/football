@@ -4,6 +4,7 @@ import numpy as np
 import data_type
 
 
+
 def angle2quat(yaw,pitch,roll):
     q0=math.cos(yaw/2)*math.cos(pitch/2)*math.cos(roll/2)-math.sin(yaw/2)*math.sin(pitch/2)*math.sin(roll/2)
     q1=math.cos(yaw/2)*math.cos(pitch/2)*math.sin(roll/2)+math.sin(yaw/2)*math.sin(pitch/2)*math.cos(roll/2)
@@ -63,14 +64,19 @@ def motion(acc_data,gyro_data,contact_flag):
     hat2=[]
     hat3=[]
     hat4=[]
+    aa=[]
+    vel=[]
+    ss=[]
     n=len(acc_data.x_data)
+    f=100
+    T=1/f
 
     # detect the inital quaternion
     qs_E=OriginalQuat(acc_data.x_data[0],acc_data.y_data[0],acc_data.z_data[0],[0,1,0,0])
     q0[0]=qs_E[0]
     q1[0]=qs_E[1]
     q2[0]=qs_E[2];
-    q3[1]=qs_E[3];
+    q3[0]=qs_E[3];
     ax=acc_data.x_data
     ay=acc_data.y_data
     az=acc_data.z_data
@@ -79,7 +85,7 @@ def motion(acc_data,gyro_data,contact_flag):
     wz=gyro_data.z_data
 
     # calculate the attitude and position
-    for i in range(0,n-1):
+    for i in range(0,n):
 
         # use acc data to calculate attitude
         norm2=math.sqrt(ax[i]*ax[i]+ay[i]*ay[i]+az[i]*az[i]);
@@ -146,7 +152,52 @@ def motion(acc_data,gyro_data,contact_flag):
         q3.append(q33)
 
         norm = math.sqrt(q0[i+1]*q0[i+1] + q1[i+1]*q1[i+1] + q2[i+1]*q2[i+1] + q3[i+1]*q3[i+1]);
-        q0[i+1] = q0[i+1] / norm;
-        q1[i+1] = q1[i+1] / norm;
-        q2[i+1] = q2[i+1] / norm;
-        q3[i+1] = q3[i+1] / norm;
+        q0[i+1] = q0[i+1] / norm
+        q1[i+1] = q1[i+1] / norm
+        q2[i+1] = q2[i+1] / norm
+        q3[i+1] = q3[i+1] / norm
+
+        # calculalte the move acceleration
+        q=[q0[i+1],q1[i+1],q2[i+1],q3[i+1]]
+        a=[0,ax[i],ay[i],az[i]]
+        qq=quatconj(q)
+        aaa=quatmultiply(quatmultiply(q,a),qq)
+        aaa=(aaa-[0,0,0,1])*9.8
+
+        aa.append(aaa)
+
+        # calculate the velocity and position
+        if i==0:
+            a1=a1+T*aa[i][1]
+            b1=b1+T*aa[i][2]
+            c1=c1+T*aa[i][3]
+            vell=[a1,b1,c1]
+            vel.append(vell)
+            a2=a2+vel[i][0]*T+T*T*aa[i][1]/2;
+            b2=b2+vel[i][1]*T+T*T*aa[i][2]/2;
+            c2=c2+vel[i][2]*T+T*T*aa[i][3]/2;
+            sss=[a2,b2,c2]
+            ss.append(sss)
+        else:
+            if contact_flag[i]==True:
+                a1=0;
+                b1=0;
+                c1=0;
+                vell=[a1,b1,c1]
+                vel.append(vell)
+                a2=ss[i-1][0]
+                b2=ss[i-1][1]
+                c2=ss[i-1][2]
+                sss=[a2,b2,c2]
+                ss.append(sss)
+            else:
+                a1=a1+T*(aa[i][1]+aa[i-1][1])/2;
+                b1=b1+T*(aa[i][2]+aa[i-1][2])/2;
+                c1=c1+T*(aa[i][3]+aa[i-1][3])/2;
+                vell=[a1,b1,c1]
+                vel.append(vell)
+                a2=a2+vel[i][0]*T+T*T*(aa[i][1]+aa[i-1][1])/4;
+                b2=b2+vel[i][1]*T+T*T*(aa[i][2]+aa[i-1][2])/4;
+                c2=c2+vel[i][2]*T+T*T*(aa[i][3]+aa[i-1][3])/4;
+                sss=[a2,b2,c2]
+                ss.append(sss)
