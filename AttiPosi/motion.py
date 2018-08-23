@@ -6,6 +6,14 @@ import data_type
 
 
 def angle2quat(yaw,pitch,roll):
+
+    """    euler to quaternion
+    Args:
+        euler ZXY
+    Returns:
+        quaternion
+    """
+
     q0=math.cos(yaw/2)*math.cos(pitch/2)*math.cos(roll/2)-math.sin(yaw/2)*math.sin(pitch/2)*math.sin(roll/2)
     q1=math.cos(yaw/2)*math.cos(pitch/2)*math.sin(roll/2)+math.sin(yaw/2)*math.sin(pitch/2)*math.cos(roll/2)
     q2=math.cos(yaw/2)*math.sin(pitch/2)*math.cos(roll/2)-math.sin(yaw/2)*math.cos(pitch/2)*math.sin(roll/2)
@@ -13,9 +21,25 @@ def angle2quat(yaw,pitch,roll):
     return [q0,q1,q2,q3]
 
 def quatconj(q):
+
+    """    conjugate the quaternion
+    Args:
+        inital quaternion
+    Returns:
+        the conjugated of inital quaternion
+    """
+
     return [q[0],-q[1],-q[2],-q[3]]
 
 def quatmultiply(q,a):
+
+    """    multiply of two quaternions
+    Args:
+        Acceleration data, gyroscope data and length of the data
+    Returns:
+        contact_flag ( 1 ---- contact    0 ---- swing )
+    """
+
     d0=q[0]*a[0]-q[1]*a[1]-q[2]*a[2]-q[3]*a[3]
     d1=q[1]*a[0]+q[0]*a[1]+q[2]*a[3]-q[3]*a[2]
     d2=q[2]*a[0]+q[0]*a[2]+q[3]*a[1]-q[1]*a[3]
@@ -23,6 +47,14 @@ def quatmultiply(q,a):
     return [d0,d1,d2,d3]
 
 def OriginalQuat(ax,ay,az,xs_s):
+
+    """    calculate the first quaternions
+    Args:
+        acceleration data and the vector of x axis in sensor coordinate
+    Returns:
+        first quaternion in global coordinate (default north as the direction of x axis)
+    """
+
     norm1=math.sqrt(ax**2+ay**2+az**2)
     ax=ax/norm1
     ay=ay/norm1
@@ -44,6 +76,13 @@ def OriginalQuat(ax,ay,az,xs_s):
 
 
 def motion(acc_data,gyro_data,contact_flag):
+
+    """    calculate the quaternion of each frame and the velocity and position
+    Args:
+        acceleration data, gyroscope data and contact flag
+    Returns:
+        quaternions(q0,q1,q2,q3), velocity(x,y,z) and position(x,y,z)
+    """
 
     error=0.0175               # legacy 0.0175    micro team 0.0169
     B=error*math.sqrt(3/4)
@@ -81,6 +120,7 @@ def motion(acc_data,gyro_data,contact_flag):
 
     # detect the inital quaternion
     qs_E=OriginalQuat(acc_data.x_data[0],acc_data.y_data[0],acc_data.z_data[0],[0,1,0,0])
+    print(qs_E)
     q00=qs_E[0]
     q11=qs_E[1]
     q22=qs_E[2];
@@ -101,19 +141,19 @@ def motion(acc_data,gyro_data,contact_flag):
 
         # use acc data to calculate attitude
         norm2=math.sqrt(ax[i]*ax[i]+ay[i]*ay[i]+az[i]*az[i]);
-        ax[i]=ax[i]/norm2;
-        ay[i]=ay[i]/norm2;
-        az[i]=az[i]/norm2;
+        ax[i]=ax[i]/norm2
+        ay[i]=ay[i]/norm2
+        az[i]=az[i]/norm2
 
-        ff1=2*q1[i]*q3[i]-2*q0[i]*q2[i]-ax[i];
-        ff2=2*q0[i]*q1[i]-2*q2[i]*q3[i]-ay[i];
-        ff3=1-2*q1[i]*q1[i]-2*q2[i]*q2[i]-az[i];
-        jj1124=2*q2[i];
-        jj1223=2*q3[i];
-        jj1322=2*q0[i];
-        jj1421=2*q1[i];
-        jj32=2*jj1421;
-        jj33=2*jj1124;
+        ff1=2*q1[i]*q3[i]-2*q0[i]*q2[i]-ax[i]
+        ff2=2*q0[i]*q1[i]-2*q2[i]*q3[i]-ay[i]
+        ff3=1-2*q1[i]*q1[i]-2*q2[i]*q2[i]-az[i]
+        jj1124=2*q2[i]
+        jj1223=2*q3[i]
+        jj1322=2*q0[i]
+        jj1421=2*q1[i]
+        jj32=2*jj1421
+        jj33=2*jj1124
 
         f1.append(ff1)
         f2.append(ff2)
@@ -174,6 +214,10 @@ def motion(acc_data,gyro_data,contact_flag):
         a=[0,ax[i],ay[i],az[i]]
         qq=quatconj(q)
         aaa=quatmultiply(quatmultiply(q,a),qq)
+        #print(aaa[0])
+        #print(aaa[1])
+        #print(aaa[2])
+        #print(aaa[3])
         aaa[0]=aaa[0]*9.8
         aaa[1]=aaa[1]*9.8
         aaa[2]=aaa[2]*9.8

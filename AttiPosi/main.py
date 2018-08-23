@@ -1,6 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 import readData
 import Cal_Acc_Gyro
@@ -9,6 +10,9 @@ import motion
 file_dir=os.getcwd();
 print (file_dir)
 data_file_number='2';
+
+f=100
+T=1/f
 
 #   1. read data
 measure_data=readData.readData(file_dir,data_file_number)
@@ -19,16 +23,22 @@ contact_flag=Cal_Acc_Gyro.contac_detection(measure_data.acc_data,measure_data.gy
 
 #   3. calculate the attitude and position
 calculate_data=motion.motion(measure_data.acc_data,measure_data.gyro_data,contact_flag)
+
 """
 #   4. plot the signal of vel and position
+n=measure_data.frames
+t=np.linspace(0,n*T,n+1)
 fig=plt.figure
-ax1=fig.subplot(2,1,1)
+ax1=plt.subplot(2,1,1)
 ax1.plot(t,calculate_data.vel.x_data,t,calculate_data.vel.y_data,t,calculate_data.vel.z_data)
-ax1.legend('x','y','z')
-ax2=fig.subplot(2,1,2)
-ax2.plot(t,calculate_data.ss.x_data,t,calculate_data.ss.y_data,t,calculate_data.ss.z_datat)
-ax2.legend('x','y','z')
+#ax1.legend('x','y','z')
+ax2=plt.subplot(2,1,2)
+ax2.plot(t,calculate_data.ss.x_data,t,calculate_data.ss.y_data,t,calculate_data.ss.z_data)
+#ax2.legend('x','y','z')
+fig_name=file_dir+'//Processed Data//velPosi'+data_file_number
+fig.save(fig_name,format='jpg')
 """
+
 #   5. save the attitude and position data
 data_frame=pd.DataFrame({'quaternion(q0)':calculate_data.quat.q0,
 'quaternion(q1)':calculate_data.quat.q1,'quaternion(q2)':calculate_data.quat.q2,

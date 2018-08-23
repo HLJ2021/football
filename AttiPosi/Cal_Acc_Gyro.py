@@ -10,6 +10,13 @@ T=1/f
 
 def CalculateTotal(acc_data,gyro_data):
 
+    """    Calculate the norm od the acc_data and gyro_data
+    Args:
+        Preprocessed acceleration data and gyroscope data
+    Returns:
+        The norm of acceleration data and the norm of gyroscope data
+    """
+
     acc_total=[]
     gyro_total=[]
     for x,y,z in zip(acc_data.x_data,acc_data.y_data,acc_data.z_data):
@@ -25,6 +32,13 @@ def CalculateTotal(acc_data,gyro_data):
 
 def contac_detection(acc_data,gyro_data,n):
 
+    """    Detect the period swing or not
+    Args:
+        Acceleration data, gyroscope data and length of the data
+    Returns:
+        contact_flag ( 1 ---- contac    0 ---- swing )
+    """
+
     count1=0
     count2=0
     th1=0
@@ -35,20 +49,22 @@ def contac_detection(acc_data,gyro_data,n):
     acc_total=total.acc_total
     gyro_total=total.gyro_total
 
-    print(acc_total)
-    print(gyro_total)
+    #print(acc_total)
+    #print(gyro_total)
 
     for i in range(10,n-10):
         if (acc_total[i]<=acc_total[i-10] and acc_total[i]<=acc_total[i-1] and
-            acc_total[i]<=acc_total[i+1] and acc_total[i]<=acc_total[i+10]):
+            acc_total[i]<=acc_total[i+1] and acc_total[i]<=acc_total[i+10] and
+            acc_total[i]<=0.8):
             th1=th1+acc_total[i]
             count1=count1+1
         if (gyro_total[i]<=gyro_total[i-10] and gyro_total[i]<=gyro_total[i-1] and
-            gyro_total[i]<=gyro_total[i+1] and gyro_total[i]<=gyro_total[i+10]):
+            gyro_total[i]<=gyro_total[i+1] and gyro_total[i]<=gyro_total[i+10] and
+            gyro_total[i]<=2):
             th2=th2+gyro_total[i]
             count2=count2+1
-    threshold1=th1/count1-0.1   # according to the experince
-    threshold2=th2/count2-0.35
+    threshold1=th1/count1   # according to the experince
+    threshold2=th2/count2
 
     print(threshold1)
     print(threshold2)
