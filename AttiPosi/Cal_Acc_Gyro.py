@@ -66,8 +66,8 @@ def contac_detection(acc_data,gyro_data,n):
     threshold1=th1/count1   # according to the experince
     threshold2=th2/count2
 
-    print(threshold1)
-    print(threshold2)
+    #print(threshold1)
+    #print(threshold2)
 
     for j in range(0,n):
         if (acc_total[j]>threshold1 and gyro_total[j]>threshold2):

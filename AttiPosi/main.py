@@ -18,26 +18,30 @@ T=1/f
 measure_data=readData.readData(file_dir,data_file_number)
 print (measure_data.frames)
 
-#   2. calculate total acc and gyro and detect the contact
+#   2. calculate the norm of  acc and gyro and detect the contact
 contact_flag=Cal_Acc_Gyro.contac_detection(measure_data.acc_data,measure_data.gyro_data,measure_data.frames)
 
 #   3. calculate the attitude and position
 calculate_data=motion.motion(measure_data.acc_data,measure_data.gyro_data,contact_flag)
 
-"""
 #   4. plot the signal of vel and position
 n=measure_data.frames
 t=np.linspace(0,n*T,n+1)
-fig=plt.figure
+plt.figure(1)
 ax1=plt.subplot(2,1,1)
-ax1.plot(t,calculate_data.vel.x_data,t,calculate_data.vel.y_data,t,calculate_data.vel.z_data)
-#ax1.legend('x','y','z')
+#ax1.plot(t,calculate_data.vel.x_data,t,calculate_data.vel.y_data,t,calculate_data.vel.z_data,label='z')
+ax1.plot(t,calculate_data.vel.x_data,label='x')
+ax1.plot(t,calculate_data.vel.y_data,label='y')
+ax1.plot(t,calculate_data.vel.z_data,label='z')
+ax1.legend()
 ax2=plt.subplot(2,1,2)
-ax2.plot(t,calculate_data.ss.x_data,t,calculate_data.ss.y_data,t,calculate_data.ss.z_data)
-#ax2.legend('x','y','z')
+#ax2.plot(t,calculate_data.ss.x_data,t,calculate_data.ss.y_data,t,calculate_data.ss.z_data)
+ax2.plot(t,calculate_data.ss.x_data,label='x')
+ax2.plot(t,calculate_data.ss.y_data,label='y')
+ax2.plot(t,calculate_data.ss.z_data,label='z')
+ax2.legend()
 fig_name=file_dir+'//Processed Data//velPosi'+data_file_number
-fig.save(fig_name,format='jpg')
-"""
+plt.savefig(fig_name+'.jpg')
 
 #   5. save the attitude and position data
 data_frame=pd.DataFrame({'quaternion(q0)':calculate_data.quat.q0,

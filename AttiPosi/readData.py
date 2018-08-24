@@ -70,6 +70,6 @@ def readData(file_dir,data_file_number):
 #          print(Left_Acc_x)
     acc_data = data_type.Vec3Data(Left_Acc_x, Left_Acc_y, Left_Acc_z);
     gyro_data = data_type.Vec3Data(Left_Gyro_x, Left_Gyro_y, Left_Gyro_z);
-    print (acc_data.x_data)
+    #print (acc_data.x_data)
 
     return data_type.IMUData(acc_data, gyro_data)

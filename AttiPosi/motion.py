@@ -14,10 +14,10 @@ def angle2quat(yaw,pitch,roll):
         quaternion
     """
 
-    q0=math.cos(yaw/2)*math.cos(pitch/2)*math.cos(roll/2)-math.sin(yaw/2)*math.sin(pitch/2)*math.sin(roll/2)
-    q1=math.cos(yaw/2)*math.cos(pitch/2)*math.sin(roll/2)+math.sin(yaw/2)*math.sin(pitch/2)*math.cos(roll/2)
-    q2=math.cos(yaw/2)*math.sin(pitch/2)*math.cos(roll/2)-math.sin(yaw/2)*math.cos(pitch/2)*math.sin(roll/2)
-    q3=math.sin(yaw/2)*math.cos(pitch/2)*math.cos(roll/2)+math.cos(yaw/2)*math.sin(pitch/2)*math.sin(roll/2)
+    q0=math.cos(yaw/2)*math.cos(pitch/2)*math.cos(roll/2)+math.sin(yaw/2)*math.sin(pitch/2)*math.sin(roll/2)
+    q1=math.cos(yaw/2)*math.cos(pitch/2)*math.sin(roll/2)-math.sin(yaw/2)*math.sin(pitch/2)*math.cos(roll/2)
+    q2=math.cos(yaw/2)*math.sin(pitch/2)*math.cos(roll/2)+math.sin(yaw/2)*math.cos(pitch/2)*math.sin(roll/2)
+    q3=math.sin(yaw/2)*math.cos(pitch/2)*math.cos(roll/2)-math.cos(yaw/2)*math.sin(pitch/2)*math.sin(roll/2)
     return [q0,q1,q2,q3]
 
 def quatconj(q):
@@ -35,9 +35,9 @@ def quatmultiply(q,a):
 
     """    multiply of two quaternions
     Args:
-        Acceleration data, gyroscope data and length of the data
+        two quaternions
     Returns:
-        contact_flag ( 1 ---- contact    0 ---- swing )
+        the result of multiply of two quaternions
     """
 
     d0=q[0]*a[0]-q[1]*a[1]-q[2]*a[2]-q[3]*a[3]
@@ -65,11 +65,17 @@ def OriginalQuat(ax,ay,az,xs_s):
     my=ax/math.sqrt(ax**2+ay**2)
     mz=0;
     yaw=math.atan(-my*math.cos(roll)/mx*math.cos(pitch)+my*math.sin(pitch)*math.sin(roll))
+    #print(roll,pitch,yaw)
     qs_w=angle2quat(yaw,pitch,roll)
+    #print('qs_w')
+    #print(qs_w)
     qw_s=quatconj(qs_w)
     xs_w=quatmultiply(quatmultiply(qs_w,xs_s),qw_s)
+    #print(xs_w)
     angle=math.atan(xs_w[2]/xs_w[1])
+    #print(angle)
     qw_E=[math.cos(angle/2),0,0,-math.sin(angle/2)]
+    #print(qw_E)
     qs_E=quatmultiply(qw_E,qs_w)
     return qs_E
 
@@ -120,7 +126,7 @@ def motion(acc_data,gyro_data,contact_flag):
 
     # detect the inital quaternion
     qs_E=OriginalQuat(acc_data.x_data[0],acc_data.y_data[0],acc_data.z_data[0],[0,1,0,0])
-    print(qs_E)
+    #print(qs_E)
     q00=qs_E[0]
     q11=qs_E[1]
     q22=qs_E[2];
@@ -141,13 +147,13 @@ def motion(acc_data,gyro_data,contact_flag):
 
         # use acc data to calculate attitude
         norm2=math.sqrt(ax[i]*ax[i]+ay[i]*ay[i]+az[i]*az[i]);
-        ax[i]=ax[i]/norm2
-        ay[i]=ay[i]/norm2
-        az[i]=az[i]/norm2
+        axx=ax[i]/norm2
+        ayy=ay[i]/norm2
+        azz=az[i]/norm2
 
-        ff1=2*q1[i]*q3[i]-2*q0[i]*q2[i]-ax[i]
-        ff2=2*q0[i]*q1[i]-2*q2[i]*q3[i]-ay[i]
-        ff3=1-2*q1[i]*q1[i]-2*q2[i]*q2[i]-az[i]
+        ff1=2*q1[i]*q3[i]-2*q0[i]*q2[i]-axx
+        ff2=2*q0[i]*q1[i]-2*q2[i]*q3[i]-ayy
+        ff3=1-2*q1[i]*q1[i]-2*q2[i]*q2[i]-azz
         jj1124=2*q2[i]
         jj1223=2*q3[i]
         jj1322=2*q0[i]
@@ -210,8 +216,8 @@ def motion(acc_data,gyro_data,contact_flag):
         q3[i+1] = q3[i+1] / norm
 
         # calculalte the move acceleration
-        q=[q0[i+1],q1[i+1],q2[i+1],q3[i+1]]
-        a=[0,ax[i],ay[i],az[i]]
+        q=[round(q0[i+1],4),round(q1[i+1],4),round(q2[i+1],4),round(q3[i+1],4)]
+        a=[0,round(ax[i],4),round(ay[i],4),round(az[i],4)]
         qq=quatconj(q)
         aaa=quatmultiply(quatmultiply(q,a),qq)
         #print(aaa[0])
@@ -222,6 +228,7 @@ def motion(acc_data,gyro_data,contact_flag):
         aaa[1]=aaa[1]*9.8
         aaa[2]=aaa[2]*9.8
         aaa[3]=(aaa[3]-1)*9.8
+        #print(aaa[3])
 
         aa.append(aaa)
 
