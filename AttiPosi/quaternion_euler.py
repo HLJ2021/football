@@ -163,6 +163,15 @@ class Quat():
         self.q2 = q2
         self.q3 = q3
 
+def smoothlist(data):
+    n = len(data)
+    for i in range(0,n-1):
+        if data[i+1]-data[i] >= 6:
+            data[i+1] = data[i+1]-2*math.pi
+        elif data[i+1]-data[i] <= -6:
+            data[i+1] = data[i+1] + 2*math.pi
+    return data
+
 f=100
 T=1/f
 frame=0
@@ -171,7 +180,7 @@ q1_list=[]
 q2_list=[]
 q3_list=[]
 
-data_number='85-4'
+data_number='26-2'
 #file_dir=os.getcwd();
 file_dir='F:\\python(football)\\football-data-process\\Data\\footballDATA(set)\\180814(legacy only)\\data'+data_number+'_p.csv'
 with open (file_dir) as csvfile:
@@ -190,6 +199,10 @@ with open (file_dir) as csvfile:
 
 data = Quat(q0_list,q1_list,q2_list,q3_list)
 a_list,b_list,r_list,order = quaternion2euler(data,'xzx')
+a_list = smoothlist(a_list)
+b_lsit = smoothlist(b_list)
+r_list = smoothlist(r_list)
+
 #print(a_list)
 n=len(a_list)
 t=np.linspace(0,(n-1)*T,n)
